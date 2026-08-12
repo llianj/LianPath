@@ -1,10 +1,18 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import {
+import { 
+  createContext, 
+  useContext, 
+  useEffect, 
+  useState } from "react";
+
+  import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from "firebase/auth";
+
 import { auth } from "../config/firebase";
+
 
 const AuthContext = createContext();
 
@@ -49,16 +57,24 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
+    async function recuperarSenha(email) {
+  return sendPasswordResetEmail(auth, email);
+}
+
   async function getToken() {
   if (!auth.currentUser) return null;
   return auth.currentUser.getIdToken();
 }
 
-  return (
-    <AuthContext.Provider value={{ user, perfil, login, logout, loading, getToken }}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+
+
+return (
+  <AuthContext.Provider
+    value={{ user, perfil, login, logout, loading, getToken, recuperarSenha }}
+  >
+    {!loading && children}
+  </AuthContext.Provider>
+);
 }
 
 export function useAuth() {

@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
+import CadastroUsuario from "./pages/CadastroUsuario";
+import RecuperarSenha from "./pages/RecuperarSenha";
 
 function Home() {
   const { user, perfil, logout, getToken } = useAuth();
@@ -26,7 +28,12 @@ function Home() {
 }
 
 function PainelAdmin() {
-  return <h1>Painel do Administrador</h1>;
+  return (
+    <div style={{ maxWidth: 360, margin: "80px auto", fontFamily: "sans-serif" }}>
+      <h1>Painel do Administrador</h1>
+      <a href="/admin/cadastrar-usuario">Cadastrar novo usuário</a>
+    </div>
+  );
 }
 
 function PrivateRoute({ children, perfisPermitidos }) {
@@ -63,6 +70,15 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+  path="/admin/cadastrar-usuario"
+  element={
+    <PrivateRoute perfisPermitidos={["administrador"]}>
+      <CadastroUsuario />
+    </PrivateRoute>
+  }
+/>
+<Route path="/recuperar-senha" element={<RecuperarSenha />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

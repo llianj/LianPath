@@ -1,28 +1,27 @@
-//mudar o design disso daqui
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-function Login() {
+function RecuperarSenha() {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { recuperarSenha } = useAuth();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
+    setMensagem("");
     setCarregando(true);
 
     try {
-      await login(email, senha);
-      navigate("/");
+      await recuperarSenha(email);
+      setMensagem("Se este e-mail estiver cadastrado, um link de redefinição foi enviado.");
     } catch (err) {
-      setErro("E-mail ou senha inválidos.");
       console.error(err);
+      setMensagem("Se este e-mail estiver cadastrado, um link de redefinição foi enviado.");
     } finally {
       setCarregando(false);
     }
@@ -30,8 +29,8 @@ function Login() {
 
   return (
     <div style={{ maxWidth: 360, margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h1>LianPath</h1>
-      <p>Faça login para continuar</p>
+      <h1>Recuperar Senha</h1>
+      <p>Informe seu e-mail cadastrado para receber o link de redefinição.</p>
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 12 }}>
@@ -45,28 +44,19 @@ function Login() {
           />
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label>Senha</label>
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            style={{ width: "100%", padding: 8 }}
-          />
-        </div>
-
+        {mensagem && <p style={{ color: "green" }}>{mensagem}</p>}
         {erro && <p style={{ color: "red" }}>{erro}</p>}
 
         <button type="submit" disabled={carregando} style={{ width: "100%", padding: 10 }}>
-          {carregando ? "Entrando..." : "Entrar"}
+          {carregando ? "Enviando..." : "Enviar link de redefinição"}
         </button>
-        <p style={{ marginTop: 16 }}>
-  <a href="/recuperar-senha">Esqueci minha senha</a>
-</p>
       </form>
+
+      <p style={{ marginTop: 16 }}>
+        <Link to="/login">Voltar ao login</Link>
+      </p>
     </div>
   );
 }
 
-export default Login;
+export default RecuperarSenha;
