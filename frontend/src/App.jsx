@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import CadastroUsuario from "./pages/CadastroUsuario";
-import RecuperarSenha from "./pages/RecuperarSenha";
+// import RecuperarSenha from "./pages/RecuperarSenha";
 
 function Home() {
   const { user, perfil, logout, getToken } = useAuth();
@@ -78,7 +78,7 @@ function App() {
     </PrivateRoute>
   }
 />
-<Route path="/recuperar-senha" element={<RecuperarSenha />} />
+{/* <Route path="/recuperar-senha" element={<RecuperarSenha />} /> */}
         </Routes>
       </AuthProvider>
     </BrowserRouter>

@@ -1,18 +1,27 @@
-//mudar o design disso daqui
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "./Login.css";
 
 function Login() {
+  const [modo, setModo] = useState("login"); // "login" | "recuperar"
+
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  const { login } = useAuth();
+  const { login, recuperarSenha } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
+  function trocarModo(novoModo) {
+    setModo(novoModo);
+    setErro("");
+    setMensagem("");
+  }
+
+  async function handleLogin(e) {
     e.preventDefault();
     setErro("");
     setCarregando(true);
@@ -28,43 +37,94 @@ function Login() {
     }
   }
 
+  async function handleRecuperar(e) {
+    e.preventDefault();
+    setErro("");
+    setMensagem("");
+    setCarregando(true);
+
+    try {
+      await recuperarSenha(email);
+    } catch (err) {
+      console.error(err);
+      // mesma mensagem em caso de erro, por segurança (evita confirmar quais e-mails existem)
+    } finally {
+      setMensagem("Se este e-mail estiver cadastrado, um link de redefinição foi enviado.");
+      setCarregando(false);
+    }
+  }
+
   return (
-    <div style={{ maxWidth: 360, margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h1>LianPath</h1>
-      <p>Faça login para continuar</p>
+    <div className="login-container">
+      <div className="login-card">
+        <h1>LianPath</h1>
+        <p>
+          {modo === "login"
+            ? "Faça login para continuar"
+            : "Informe seu e-mail para recuperar a senha"}
+        </p>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 12 }}>
-          <label>E-mail</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", padding: 8 }}
-          />
-        </div>
+        {modo === "login" ? (
+          <form onSubmit={handleLogin}>
+            <div className="login-field">
+              <label>E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label>Senha</label>
-          <input
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            style={{ width: "100%", padding: 8 }}
-          />
-        </div>
+            <div className="login-field">
+              <label>Senha</label>
+              <input
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+              />
+            </div>
 
-        {erro && <p style={{ color: "red" }}>{erro}</p>}
+            {erro && <p className="login-erro">{erro}</p>}
 
-        <button type="submit" disabled={carregando} style={{ width: "100%", padding: 10 }}>
-          {carregando ? "Entrando..." : "Entrar"}
-        </button>
-        <p style={{ marginTop: 16 }}>
-  <a href="/recuperar-senha">Esqueci minha senha</a>
-</p>
-      </form>
+            <button type="submit" disabled={carregando} className="login-button">
+              {carregando ? "Entrando..." : "Entrar"}
+            </button>
+
+            <p className="login-link">
+              <button type="button" className="login-link-btn" onClick={() => trocarModo("recuperar")}>
+                Esqueci minha senha
+              </button>
+            </p>
+          </form>
+        ) : (
+          <form onSubmit={handleRecuperar}>
+            <div className="login-field">
+              <label>E-mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            {mensagem && <p className="login-mensagem">{mensagem}</p>}
+            {erro && <p className="login-erro">{erro}</p>}
+
+            <button type="submit" disabled={carregando} className="login-button">
+              {carregando ? "Enviando..." : "Enviar link de redefinição"}
+            </button>
+
+            <p className="login-link">
+              <button type="button" className="login-link-btn" onClick={() => trocarModo("login")}>
+                Voltar para o login
+              </button>
+            </p>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
